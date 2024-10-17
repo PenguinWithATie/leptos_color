@@ -14,7 +14,72 @@ enum MoveType {
     Mouse,
     Touch,
 }
-
+/// A custom hook for handling position-based interactions in a component.
+///
+/// This hook provides functionality for tracking and responding to mouse and touch
+/// interactions within a specified element, typically used for draggable or
+/// position-sensitive components like color pickers or sliders.
+///
+/// # Arguments
+///
+/// * `props`: `UsePositionProps` - A struct containing the configuration for the hook.
+///
+/// # Returns
+///
+/// A tuple containing:
+/// 1. A `NodeRef<Div>` that should be attached to the target element.
+/// 2. A `Callback<UiEvent>` that should be used to handle the start of an interaction (mousedown or touchstart).
+///
+/// # UsePositionProps
+///
+/// ```rust
+/// #[derive(Clone)]
+/// pub struct UsePositionProps {
+///     pub on_move: Callback<(f64, f64), ()>,
+/// }
+/// ```
+///
+/// * `on_move`: A callback that is triggered when the position changes. It receives a tuple of (x, y)
+///   coordinates, normalized to the range [0, 1] relative to the element's dimensions.
+///
+/// # Behavior
+///
+/// - Tracks mouse and touch interactions within the target element.
+/// - Normalizes the position to values between 0 and 1 for both x and y coordinates.
+/// - Handles dragging behavior, including starting, moving, and ending drag operations.
+/// - Attaches necessary event listeners dynamically when dragging starts and removes them when it ends.
+/// - Works with both mouse and touch events for broad device compatibility.
+///
+/// # Example
+///
+/// ```rust
+/// use leptos::*;
+///
+/// #[component]
+/// fn PositionTracker() -> impl IntoView {
+///     let (position, set_position) = create_signal((0.0, 0.0));
+///
+///     let props = UsePositionProps {
+///         on_move: Callback::new(move |pos| set_position.set(pos)),
+///     };
+///
+///     let (ref_div, handle_start) = use_position(props);
+///
+///     view! {
+///         <div
+///             ref=ref_div
+///             on:mousedown=handle_start
+///             on:touchstart=handle_start
+///             style="width: 200px; height: 200px; background-color: #f0f0f0;"
+///         >
+///             "Drag here"
+///         </div>
+///         <p>"Position: " {move || format!("({:.2}, {:.2})", position.get().0, position.get().1)}</p>
+///     }
+/// }
+/// ```
+///
+/// This example creates a draggable area that tracks and displays the current position.
 pub fn use_position(props: UsePositionProps) -> (NodeRef<Div>, Callback<UiEvent>) {
     let (dragging, set_dragging) = create_signal(false);
     let ref_div = create_node_ref::<Div>();

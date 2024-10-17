@@ -7,6 +7,57 @@ use html::Div;
 use leptos::logging::warn;
 use leptos::*;
 use leptos_use::{use_css_var_with_options, UseCssVarOptions};
+/// A comprehensive color picker component.
+///
+/// This component provides a full-featured color picker with saturation/value selection,
+/// hue selection, alpha selection (optional), and input fields for hex, RGB, and alpha values.
+///
+/// # Props
+///
+/// * `theme`: A `MaybeSignal<Theme>` representing the theme for the component. Defaults to `Theme::default()`.
+/// * `color`: A `Signal<Color>` representing the current color value.
+/// * `hide_alpha`: An optional `MaybeSignal<bool>` to hide the alpha channel controls.
+/// * `hide_hex`: An optional `MaybeSignal<bool>` to hide the hexadecimal color input.
+/// * `hide_rgb`: An optional `MaybeSignal<bool>` to hide the RGB color inputs.
+/// * `on_change`: A `Callback<Color>` that is called when the color value changes.
+///
+/// # Features
+///
+/// - Saturation/Value selector: A large area for selecting color saturation and value.
+/// - Hue selector: A slider for selecting the hue of the color.
+/// - Alpha selector: An optional slider for selecting the alpha (transparency) of the color.
+/// - Hex input: An input field for entering or displaying the color in hexadecimal format.
+/// - RGB inputs: Separate input fields for red, green, and blue color components.
+/// - Alpha input: An optional input field for the alpha value.
+///
+/// # Behavior
+///
+/// - The component uses CSS variables to manage and update color values efficiently.
+/// - It reacts to changes in the `color` signal and updates all UI elements accordingly.
+/// - User interactions with any part of the color picker (saturation area, hue slider, alpha slider, or input fields)
+///   trigger the `on_change` callback with the updated color.
+///
+/// # Example
+///
+/// ```rust
+/// use leptos::*;
+/// use csscolorparser::Color;
+///
+/// #[component]
+/// fn App() -> impl IntoView {
+///     let (color, set_color) = create_signal(Color::from_rgba8(255, 0, 0, 255));
+///
+///     view! {
+///         <ColorPicker
+///             color=color
+///             on_change=move |new_color| set_color.set(new_color)
+///         />
+///     }
+/// }
+/// ```
+///
+/// This example creates a `ColorPicker` component with a default red color and updates the color
+/// when any change is made in the picker.
 #[component]
 pub fn ColorPicker(
     #[prop(into, default=Theme::default().into())] theme: MaybeSignal<Theme>,
