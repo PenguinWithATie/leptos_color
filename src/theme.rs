@@ -1,19 +1,41 @@
 use csscolorparser::Color;
-
+/// A struct representing the theme configuration for color picker components.
+///
+/// `Theme` provides a set of customizable properties to control the appearance
+/// of color picker components, including colors, dimensions, and style attributes.
 pub struct Theme {
+    /// The background color of the color picker.
     background: Color,
+    /// The background color of input elements within the color picker.
     inputBackground: Color,
+    /// The primary text color used in the color picker.
     color: Color,
+    /// The color used for borders in the color picker.
     borderColor: Color,
+    /// The border radius applied to elements in the color picker.
     borderRadius: String,
+    /// The box shadow applied to the color picker container.
     boxShadow: String,
+    /// The width of the color picker container.
     width: String,
 }
 
 impl Theme {
+    /// Creates a new `Theme` instance with default (light) settings.
+    ///
+    /// # Example
+    /// ```
+    /// let theme = Theme::default();
+    /// ```
     pub fn default() -> Self {
         Self::light()
     }
+    /// Creates a new `Theme` instance with light theme settings.
+    ///
+    /// # Example
+    /// ```
+    /// let light_theme = Theme::light();
+    /// ```
     pub fn light() -> Self {
         Self {
             background: "#fff".parse::<Color>().unwrap(),
@@ -25,7 +47,12 @@ impl Theme {
             width: "280px".to_string(),
         }
     }
-
+    /// Creates a new `Theme` instance with dark theme settings.
+    ///
+    /// # Example
+    /// ```
+    /// let dark_theme = Theme::dark();
+    /// ```
     pub fn dark() -> Self {
         Self {
             background: "rgba(40, 40, 40, 0.95)".parse::<Color>().unwrap(),
@@ -37,7 +64,32 @@ impl Theme {
             width: "280px".to_string(),
         }
     }
-
+    /// Creates a new `Theme` instance with custom settings.
+    ///
+    /// # Arguments
+    ///
+    /// * `background` - The background color of the color picker.
+    /// * `input_background` - The background color of input elements.
+    /// * `color` - The primary text color.
+    /// * `border_color` - The color used for borders.
+    /// * `border_radius` - The border radius as a CSS-compatible string.
+    /// * `box_shadow` - The box shadow as a CSS-compatible string.
+    /// * `width` - The width of the color picker as a CSS-compatible string.
+    ///
+    /// # Example
+    /// ```
+    /// use csscolorparser::Color;
+    ///
+    /// let custom_theme = Theme::custom(
+    ///     "#ffffff".parse().unwrap(),
+    ///     "#f0f0f0".parse().unwrap(),
+    ///     "#000000".parse().unwrap(),
+    ///     "#cccccc".parse().unwrap(),
+    ///     "8px".to_string(),
+    ///     "0 2px 4px rgba(0,0,0,0.1)".to_string(),
+    ///     "300px".to_string(),
+    /// );
+    /// ```
     pub fn custom(
         background: Color,
         input_background: Color,
@@ -93,6 +145,17 @@ impl Theme {
         self
     }
 
+    /// Converts the theme settings to a CSS-compatible string.
+    ///
+    /// This method generates CSS custom properties (variables) that can be
+    /// used to apply the theme to color picker components.
+    ///
+    /// # Example
+    /// ```
+    /// let theme = Theme::default();
+    /// let css = theme.to_style();
+    /// println!("CSS variables: {}", css);
+    /// ```
     pub fn to_style(&self) -> String {
         format!(
             "--lpc-background: {}; \
