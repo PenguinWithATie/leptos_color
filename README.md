@@ -3,8 +3,8 @@
 [![Crates.io](https://img.shields.io/crates/v/leptos_color.svg)](https://crates.io/crates/leptos_color)
 [![docs.rs](https://docs.rs/leptos_color/badge.svg)](https://docs.rs/leptos_color/)
 
-Leptos Color is a simple crate that provides a color picker component for [Leptos](https://github.com/leptos-rs/leptos), a Rust web framework. It allows easy integration of color selection functionality in Leptos applications.
-
+Leptos Color is a simple crate that provides a color picker component for [Leptos](https://github.com/leptos-rs/leptos), a Rust web framework. It allows easy integration of color selection functionality in Leptos applications.\
+Heavily inspired by [React Pick Color](https://www.npmjs.com/package/react-pick-color)
 ## Features
 
 - **Color Picker**: A customizable color picker component.
