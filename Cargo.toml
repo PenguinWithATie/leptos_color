@@ -7,7 +7,7 @@ authors = ["Tim Persigehl <dev@timtom2016.com>"]
 description = "Leptos Color is a simple Crate that gives access to a color picker for leptos"
 documentation = "https://docs.rs/leptos_color/latest/"
 repository = "https://github.com/TimTom2016/leptos_color"
-keywords = ["leptos", "color", "picker", ""]
+keywords = ["leptos", "color", "picker"]
 categories = ["wasm", "web-programming", "visualization"]
 readme = "README.md"
 
