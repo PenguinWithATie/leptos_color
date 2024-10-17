@@ -1,0 +1,99 @@
+.leptos-color-container {
+    background: var(--lpc-background);
+    box-shadow: var(--lpc-box-shadow);
+    border-radius: var(--lpc-border-radius);
+    width: var(--lpc-width);
+    min-width: 280px;
+    border: 1px solid var(--lpc-border-color);
+}
+
+.leptos-color-checkboard {
+    position: relative;
+    width: 25px;
+    height: 25px;
+    border-radius: var(--lpc-border-radius);
+    overflow: hidden;
+    box-shadow: inset 0 0 2px 0px rgba(0, 0, 0, 0.2);
+    background: repeating-conic-gradient(#808080 0% 25%, transparent 0% 50%) 50% /
+        10px 10px;
+}
+
+.leptos-color-value-wrapper {
+    background: var(--lpc-input-background);
+    border-radius: var(--lpc-border-radius);
+}
+
+.leptos-color-value {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    background: var(--lpc-rgba);
+    z-index: 1;
+    border: 1px solid var(--lpc-border-color);
+    border-radius: var(--lpc-border-radius);
+}
+
+.leptos-color-flex {
+    margin: 0.4rem 0.4rem;
+    width: calc(100% - 0.8rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.leptos-color-ranges {
+    flex-grow: 2;
+    margin-left: 0.4rem;
+}
+
+.leptos-color-colors {
+    margin: 0 0.5rem 0 0;
+}
+
+.leptos-color-inputs {
+    margin: 0 0.3rem 0.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.leptos-color-wrapper {
+    display: flex;
+    align-items: center;
+    color: var(--lpc-color);
+    border: 1px solid var(--lpc-border-color);
+    border-radius: var(--lpc-border-radius);
+    margin: 0.1rem;
+    background: var(--lpc-input-background);
+}
+
+.leptos-color-input {
+    width: 45px;
+    background: none;
+    color: var(--lpc-color);
+    border: none;
+    border-radius: var(--lpc-border-radius);
+    padding: 5px;
+    font-size: 10px;
+    margin: 0;
+    text-transform: uppercase;
+    box-sizing: border-box;
+}
+
+.leptos-color-prefix {
+    padding-left: 5px;
+    font-size: 10px;
+    color: var(--lpc-borderColor);
+}
+
+.leptos-color-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: sans-serif;
+    font-size: 10px;
+    color: var(--lpc-color);
+}

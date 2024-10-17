@@ -1,0 +1,34 @@
+.leptos-color-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.leptos-color-color {
+    width: calc(100% - 0.8rem);
+    height: 200px;
+    margin: 0.4rem;
+    position: relative;
+    background: hsl(var(--lpc-hue), 100%, 50%);
+    border-radius: var(--lpc-border-radius);
+    border: 1px solid var(--lpc-border-color);
+    overflow: hidden;
+}
+
+.leptos-color-pointer {
+    position: absolute;
+    cursor: default;
+    top: var(--lpc-saturation-pointer-top);
+    left: var(--lpc-saturation-pointer-left);
+}
+
+.leptos-color-circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 12px;
+    box-sizing: border-box;
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.9);
+    border: 2px solid #fff;
+}
