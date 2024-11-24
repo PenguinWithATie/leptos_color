@@ -1010,6 +1010,7 @@ dependencies = [
 name = "leptos_color"
 version = "0.6.14"
 dependencies = [
+ "cfg-if",
  "csscolorparser",
  "floating-ui-leptos",
  "leptos",

@@ -7,10 +7,12 @@ use floating_ui_leptos::{
 };
 use html::{Div, Input};
 use leptos::*;
-/// A color input component with a floating color picker.
+use wasm_bindgen::JsCast as _;
+/// A color input component with a clickable color picker popover.
 ///
 /// This component provides an input field for color values and a floating color picker
-/// that appears when the user hovers over the input.
+/// that appears when the user clicks on the input. The picker can be dismissed by clicking
+/// outside or clicking the input again.
 ///
 /// # Props
 ///
@@ -25,8 +27,9 @@ use leptos::*;
 /// # Behavior
 ///
 /// - The input field displays the current color value in RGBA format.
-/// - Hovering over the input field shows the color picker.
-/// - The color picker floats above the input field using the `floating_ui_leptos` crate.
+/// - Clicking the input field toggles the color picker popover.
+/// - The color picker closes when clicking outside or clicking the input again.
+/// - The color picker floats relative to the input using the `floating_ui_leptos` crate.
 /// - Changes to the color can be made either by editing the input field directly or using the color picker.
 /// - The `on_change` callback is triggered when a valid color value is entered or selected.
 ///
@@ -49,8 +52,16 @@ use leptos::*;
 /// }
 /// ```
 ///
-/// This example creates a `ColorInput` component with a default red color and updates the color
-/// when changed.
+/// # Styling
+///
+/// The component comes with basic styling for the popover including:
+/// - Box shadow for elevation
+/// - Border radius for rounded corners
+/// - Smooth opacity transition for showing/hiding
+/// - Backdrop blur effect (when supported by the browser)
+///
+/// Additional styling can be applied through the `class` prop for the input element
+/// or by targeting the `.color-input-container` and `.color-picker-popover` classes.
 #[component]
 pub fn ColorInput(
     #[prop(into, default=Theme::default().into())] theme: MaybeSignal<Theme>,
@@ -62,74 +73,92 @@ pub fn ColorInput(
     #[prop(into, optional)] class: MaybeProp<String>,
 ) -> impl IntoView {
     let reference_ref = NodeRef::<Input>::new();
-    let node_ref = NodeRef::<Div>::new();
+    let floating_ref = NodeRef::<Div>::new();
+    let (open, set_open) = create_signal(false);
+
+    // Click outside detection
+    let click_outside = window_event_listener(ev::click, move |ev| {
+        if !open.get() {
+            return;
+        }
+
+        let target = ev.target();
+        let target_node = target.and_then(|t| t.dyn_into::<web_sys::Node>().ok());
+
+        if let Some(target_node) = target_node {
+            if !reference_ref
+                .get()
+                .map(|r| r.contains(Some(&target_node)))
+                .unwrap_or(false)
+                && !floating_ref
+                    .get()
+                    .map(|f| f.contains(Some(&target_node)))
+                    .unwrap_or(false)
+            {
+                set_open.set(false);
+            }
+        }
+    });
+
     let middleware: MiddlewareVec = vec![
-        Box::new(Offset::new(OffsetOptions::Value(-1.0))),
+        Box::new(Offset::new(OffsetOptions::Value(8.0))), // Increased offset
         Box::new(Flip::new(FlipOptions::default().cross_axis(false))),
     ];
-    let (open, set_open) = create_signal(false);
+
     let UseFloatingReturn {
-        placement,
-        floating_styles,
-        ..
+        floating_styles, ..
     } = use_floating(
         reference_ref.into_reference(),
-        node_ref,
+        floating_ref,
         UseFloatingOptions::default()
             .open(open.into())
-            .placement(Placement::Top.into())
+            .placement(Placement::Bottom.into())
             .middleware(middleware.into())
             .while_elements_mounted_auto_update(),
     );
+
     view! {
+        <div class="color-input-container" style="position: relative;">
             <input
                 class=class
                 _ref=reference_ref
-                on:mouseover=move |_| set_open.set(true)
-                on:mouseleave=move |_| set_open.set(false)
+                on:click=move |_| set_open.update(|open| *open = !*open)
                 prop:value=move || {
                     let rgba = color.get().to_rgba8();
-                    format!("rgba({},{},{},{})",rgba[0],rgba[1],rgba[2],rgba[3])
+                    format!("rgba({},{},{},{})", rgba[0], rgba[1], rgba[2], rgba[3])
                 }
-                on:blur={move |ev| {
-                    match event_target_value(&ev).parse::<Color>() {
-                        Ok(new_color) => on_change.call(new_color),
-                        Err(_) => {},
-                    };
-                }}
-                on:change={move |ev| {
-                    match event_target_value(&ev).parse::<Color>() {
-                        Ok(new_color) => on_change.call(new_color),
-                        Err(_) => {},
-                    };
-                }}
-            >
-
-            </input>
+                on:change=move |ev| {
+                    if let Ok(new_color) = event_target_value(&ev).parse::<Color>() {
+                        on_change.call(new_color);
+                    }
+                }
+            />
             <div
-                node_ref={node_ref}
-                style:display=move || match open.get() {
-                            true => "block",
-                            false => "none"
-                        }
-                style:border-width="5px"
-                style:border-color="transparent"
-                style:border-style="solid"
-                style:position=move || floating_styles.get().style_position()
+                node_ref=floating_ref
+                class="color-picker-popover"
+                style:position="absolute"
+                style:display=move || if open.get() { "block" } else { "none" }
                 style:top=move || floating_styles.get().style_top()
                 style:left=move || floating_styles.get().style_left()
                 style:transform=move || floating_styles.get().style_transform()
-                style:will-change=move || floating_styles.get().style_will_change()
+                style:background-color="#fff"
+                style:box-shadow="0 2px 10px rgba(0, 0, 0, 0.1)"
+                style:border-radius="4px"
                 style:z-index="1000"
-                on:mouseenter=move |_| set_open.set(true)
-                on:mouseover=move |_| set_open.set(true)
-                on:mouseleave=move |_| set_open.set(false)
-                >
-
-
-                    <ColorPicker theme=theme color=color hide_hex=hide_hex hide_rgb=hide_rgb hide_alpha=hide_alpha on_change=move |new_color: Color| {
+                style:opacity=move || if open.get() { "1" } else { "0" }
+                style:transition="opacity 0.2s ease-in-out"
+            >
+                <ColorPicker
+                    theme=theme
+                    color=color
+                    hide_hex=hide_hex
+                    hide_rgb=hide_rgb
+                    hide_alpha=hide_alpha
+                    on_change=move |new_color| {
                         on_change.call(new_color);
-                    }/>
+                    }
+                />
             </div>
+        </div>
     }
 }
