@@ -105,6 +105,10 @@ pub fn ColorInput(
         Box::new(Flip::new(FlipOptions::default().cross_axis(false))),
     ];
 
+    on_cleanup(move || {
+        set_open.set(false);
+        click_outside.remove();
+    });
     let UseFloatingReturn {
         floating_styles, ..
     } = use_floating(
