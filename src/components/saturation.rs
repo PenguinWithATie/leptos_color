@@ -1,6 +1,6 @@
 use csscolorparser::Color;
 use leptos::logging::warn;
-use leptos::*;
+use leptos::prelude::*;
 
 use crate::{
     hooks::use_position::{use_position, UsePositionProps},
@@ -67,7 +67,7 @@ pub fn Saturation(#[prop(into)] on_change: Callback<(f64, f64)>) -> impl IntoVie
     // };
 
     // Closure that handles the position move
-    let handle_move = Callback::new(move |(left, top): (f64, f64)| on_change.call((left, top)));
+    let handle_move = Callback::new(move |(left, top): (f64, f64)| on_change.run((left, top)));
 
     // Use the `use_position` hook to get the ref and handle_start function
     let (ref_div, handle_start) = use_position(UsePositionProps {
@@ -75,8 +75,8 @@ pub fn Saturation(#[prop(into)] on_change: Callback<(f64, f64)>) -> impl IntoVie
     });
     view! {
         <div node_ref={ref_div} class="leptos-color-color" on:touchstart=move |ev| {
-            Callable::call(&handle_start, ev.into());} on:mousedown=move |ev| {
-            Callable::call(&handle_start, ev.into());}>
+            handle_start.run(ev.into());} on:mousedown=move |ev| {
+            handle_start.run(ev.into());}>
             <style>r"
             .saturation-white {
                 background: -webkit-linear-gradient(to right, #fff, rgba(255,255,255,0));

@@ -2,12 +2,13 @@ use crate::{components::color_picker::ColorPicker, theme::Theme};
 use csscolorparser::Color;
 use floating_ui_leptos::{
     use_floating, Alignment, AutoPlacement, AutoPlacementOptions, AutoUpdateOptions,
-    DetectOverflowOptions, Flip, FlipOptions, IntoReference, MiddlewareVec, Offset, OffsetOptions,
-    Padding, Placement, Shift, ShiftOptions, UseFloatingOptions, UseFloatingReturn,
+    DetectOverflowOptions, Flip, FlipOptions, MiddlewareVec, Offset, OffsetOptions, Padding,
+    Placement, Shift, ShiftOptions, UseFloatingOptions, UseFloatingReturn,
 };
-use html::{Div, Input};
-use leptos::*;
-use wasm_bindgen::JsCast as _;
+use leptos::html::{Div, Input};
+use leptos::{ev, prelude::*};
+use leptos_node_ref::AnyNodeRef;
+use web_sys::wasm_bindgen::JsCast as _;
 /// A color input component with a clickable color picker popover.
 ///
 /// This component provides an input field for color values and a floating color picker
@@ -64,17 +65,17 @@ use wasm_bindgen::JsCast as _;
 /// or by targeting the `.color-input-container` and `.color-picker-popover` classes.
 #[component]
 pub fn ColorInput(
-    #[prop(into, default=Theme::default().into())] theme: MaybeSignal<Theme>,
+    #[prop(into, default=Theme::default().into())] theme: Signal<Theme>,
     #[prop(into)] color: Signal<Color>,
-    #[prop(into, optional)] hide_alpha: MaybeSignal<bool>,
-    #[prop(into, optional)] hide_hex: MaybeSignal<bool>,
-    #[prop(into, optional)] hide_rgb: MaybeSignal<bool>,
+    #[prop(into, optional)] hide_alpha: Signal<bool>,
+    #[prop(into, optional)] hide_hex: Signal<bool>,
+    #[prop(into, optional)] hide_rgb: Signal<bool>,
     #[prop(into)] on_change: Callback<Color>,
     #[prop(into, optional)] class: MaybeProp<String>,
 ) -> impl IntoView {
-    let reference_ref = NodeRef::<Input>::new();
-    let floating_ref = NodeRef::<Div>::new();
-    let (open, set_open) = create_signal(false);
+    let reference_ref = AnyNodeRef::new();
+    let floating_ref = AnyNodeRef::new();
+    let (open, set_open) = signal(false);
 
     // Click outside detection
     let click_outside = window_event_listener(ev::click, move |ev| {
@@ -112,20 +113,20 @@ pub fn ColorInput(
     let UseFloatingReturn {
         floating_styles, ..
     } = use_floating(
-        reference_ref.into_reference(),
+        reference_ref,
         floating_ref,
         UseFloatingOptions::default()
             .open(open.into())
             .placement(Placement::Bottom.into())
-            .middleware(middleware.into())
+            .middleware(send_wrapper::SendWrapper::new(middleware).into())
             .while_elements_mounted_auto_update(),
     );
-
+    let on_change2 = Callback::new(move |color: Color| on_change.run(color));
     view! {
         <div class="color-input-container" style="position: relative;">
             <input
-                class=class
-                _ref=reference_ref
+                class={move || class.get().unwrap_or("".to_string())}
+                node_ref=reference_ref
                 on:click=move |_| set_open.update(|open| *open = !*open)
                 prop:value=move || {
                     let rgba = color.get().to_rgba8();
@@ -133,24 +134,25 @@ pub fn ColorInput(
                 }
                 on:change=move |ev| {
                     if let Ok(new_color) = event_target_value(&ev).parse::<Color>() {
-                        on_change.call(new_color);
+                        on_change.run(new_color);
                     }
                 }
             />
             <div
                 node_ref=floating_ref
                 class="color-picker-popover"
-                style:position="absolute"
                 style:display=move || if open.get() { "block" } else { "none" }
-                style:top=move || floating_styles.get().style_top()
-                style:left=move || floating_styles.get().style_left()
-                style:transform=move || floating_styles.get().style_transform()
                 style:background-color="#fff"
                 style:box-shadow="0 2px 10px rgba(0, 0, 0, 0.1)"
                 style:border-radius="4px"
                 style:z-index="1000"
                 style:opacity=move || if open.get() { "1" } else { "0" }
                 style:transition="opacity 0.2s ease-in-out"
+                style:position=move || floating_styles.get().style_position()
+                style:top=move || floating_styles.get().style_top()
+                style:left=move || floating_styles.get().style_left()
+                style:transform=move || floating_styles.get().style_transform().unwrap_or_default()
+                style:will-change=move || floating_styles.get().style_will_change().unwrap_or_default()
             >
                 <ColorPicker
                     theme=theme
@@ -158,9 +160,7 @@ pub fn ColorInput(
                     hide_hex=hide_hex
                     hide_rgb=hide_rgb
                     hide_alpha=hide_alpha
-                    on_change=move |new_color| {
-                        on_change.call(new_color);
-                    }
+                    on_change=on_change2
                 />
             </div>
         </div>

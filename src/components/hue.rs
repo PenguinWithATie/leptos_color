@@ -1,6 +1,6 @@
 use csscolorparser::Color;
 use leptos::logging::warn;
-use leptos::*;
+use leptos::prelude::*;
 
 use crate::{
     hooks::use_position::{use_position, UsePositionProps},
@@ -55,8 +55,7 @@ use crate::{
 #[component]
 pub fn Hue(#[prop(into)] on_change: Callback<(f64, f64)>) -> impl IntoView {
     mount_style("Hue", include_str!("./hue.css"));
-    let handle_move =
-        Callback::new(move |(left, top): (f64, f64)| Callable::call(&on_change, (left, top)));
+    let handle_move = Callback::new(move |(left, top): (f64, f64)| on_change.run((left, top)));
 
     // Use the `use_position` hook to get the ref and handle_start function
     let (ref_div, handle_start) = use_position(UsePositionProps {
@@ -64,8 +63,8 @@ pub fn Hue(#[prop(into)] on_change: Callback<(f64, f64)>) -> impl IntoView {
     });
     view! {
         <div class="leptos-color-hue-container" node_ref={ref_div} on:touchstart=move |ev| {
-            Callable::call(&handle_start, ev.into())} on:mousedown=move |ev| {
-            Callable::call(&handle_start, ev.into())}>
+            handle_start.run(ev.into())} on:mousedown=move |ev| {
+            handle_start.run(ev.into())}>
             <div class="leptos-color-hue-pointer">
                 <div class="leptos-color-hue-slider" />
             </div>

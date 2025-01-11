@@ -3,9 +3,9 @@ use crate::components::hue::Hue;
 use crate::theme::Theme;
 use crate::{components::saturation::Saturation, mount_style::mount_style};
 use csscolorparser::Color;
-use html::Div;
+use leptos::html::Div;
 use leptos::logging::warn;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_use::{use_css_var_with_options, UseCssVarOptions};
 /// A comprehensive color picker component.
 ///
@@ -60,15 +60,15 @@ use leptos_use::{use_css_var_with_options, UseCssVarOptions};
 /// when any change is made in the picker.
 #[component]
 pub fn ColorPicker(
-    #[prop(into, default=Theme::default().into())] theme: MaybeSignal<Theme>,
+    #[prop(into, default=Theme::default().into())] theme: Signal<Theme>,
     #[prop(into)] color: Signal<Color>,
-    #[prop(into, optional)] hide_alpha: MaybeSignal<bool>,
-    #[prop(into, optional)] hide_hex: MaybeSignal<bool>,
-    #[prop(into, optional)] hide_rgb: MaybeSignal<bool>,
+    #[prop(into, optional)] hide_alpha: Signal<bool>,
+    #[prop(into, optional)] hide_hex: Signal<bool>,
+    #[prop(into, optional)] hide_rgb: Signal<bool>,
     #[prop(into)] on_change: Callback<Color>,
 ) -> impl IntoView {
     mount_style("ColorPicker", include_str!("./color_picker.css"));
-    let el = create_node_ref::<Div>();
+    let el = NodeRef::<Div>::new();
     let (hue, set_hue) = use_css_var_with_options(
         "--lpc-hue",
         UseCssVarOptions::default()
@@ -188,7 +188,7 @@ pub fn ColorPicker(
 
     view! {
         <div node_ref={el} class="leptos-color-container" style=move || theme.with(|value| value.to_style())>
-            <Saturation on_change=move |(left,top): (f64,f64)| {
+            <Saturation on_change=move |left: f64,top: f64| {
                 let mut hsva = color.get().to_hsva();
                 hsva[2] = (1.0 - top) as f32;
                 hsva[1] = left as f32;
@@ -198,7 +198,7 @@ pub fn ColorPicker(
                 if hsva[1] <= 0.0 {
                     hsva[1] = 0.001;
                 }
-                on_change.call(Color::from_hsva(hsva[0], hsva[1], hsva[2], hsva[3]));
+                on_change.run(Color::from_hsva(hsva[0], hsva[1], hsva[2], hsva[3]));
             }/>
             <div class="leptos-color-flex">
                 <div class="leptos-color-value-wrapper">
@@ -207,17 +207,17 @@ pub fn ColorPicker(
                     </div>
                 </div>
                 <div class="leptos-color-ranges">
-                    <Hue on_change=move |(left,_)| {
+                    <Hue on_change=move |left,_| {
                         let hsla = color.get().to_hsla();
-                        on_change.call(Color::from_hsla((left*360.0) as f32, hsla[1], hsla[2], hsla[3]));
+                        on_change.run(Color::from_hsla((left*360.0) as f32, hsla[1], hsla[2], hsla[3]));
                     } />
                     <Show
                         when=move || { !hide_alpha.get()}
                       >
-                      <Alpha on_change=move |(left,_)| {
+                      <Alpha on_change=move |left,_| {
                           let mut color = color.get();
                           color.a = left as f32;
-                          on_change.call(color);
+                          on_change.run(color);
                       }/>
                     </Show>
                 </div>
@@ -238,25 +238,23 @@ pub fn ColorPicker(
                         style:width="54px"
                         on:blur={move |ev| {
                             match event_target_value(&ev).parse::<Color>() {
-                                Ok(new_color) => on_change.call(new_color),
+                                Ok(new_color) => on_change.run(new_color),
                                 Err(_) => {},
                             }
                         }}
                         on:change={move |ev| {
                             match event_target_value(&ev).parse::<Color>() {
-                                Ok(new_color) => on_change.call(new_color),
+                                Ok(new_color) => on_change.run(new_color),
                                 Err(_) => {},
                             }
                         }}
-                        maxLength={6}
                         prop:value={move || hex.get().replace("#", "")}
+                        maxlength={6}
                         />
                         </div>
                         <span>"Hex"</span>
                     </label>
-                    <div style="display: flex">
-                    </div>
-
+                    <div style="display: flex"/>
                 </Show>
                 <Show
                     when=move || { !hide_rgb.get()}
@@ -272,13 +270,13 @@ pub fn ColorPicker(
                             min={0}
                             max={255}
                             step={1}
-                            auto_complete="off"
+                            autocomplete="off"
                             on:change={move |ev| {
                                 match event_target_value(&ev).parse::<u8>() {
                                     Ok(value) => {
                                         let mut color = color.get();
                                         color.r = value as f32 / 255.0;
-                                        on_change.call(color);
+                                        on_change.run(color);
                                     },
                                     Err(_) => todo!(),
                                 }
@@ -299,13 +297,13 @@ pub fn ColorPicker(
                             min={0}
                             max={255}
                             step={1}
-                            auto_complete="off"
+                            autocomplete="off"
                             on:change={move |ev| {
                                 match event_target_value(&ev).parse::<u8>() {
                                     Ok(value) => {
                                         let mut color = color.get();
                                         color.g = value as f32 / 255.0;
-                                        on_change.call(color);
+                                        on_change.run(color);
                                     },
                                     Err(_) => todo!(),
                                 }
@@ -325,13 +323,13 @@ pub fn ColorPicker(
                             min={0}
                             max={255}
                             step={1}
-                            auto_complete="off"
+                            autocomplete="off"
                             on:change={move |ev| {
                                 match event_target_value(&ev).parse::<u8>() {
                                     Ok(value) => {
                                         let mut color = color.get();
                                         color.b = value as f32 / 255.0;
-                                        on_change.call(color);
+                                        on_change.run(color);
                                     },
                                     Err(_) => {},
                                 }
@@ -355,13 +353,13 @@ pub fn ColorPicker(
                         min={0}
                         max={255}
                         step={1}
-                        auto_complete="off"
+                        autocomplete="off"
                         on:change={move |ev| {
                             match event_target_value(&ev).parse::<u8>() {
                                 Ok(value) => {
                                     let mut color = color.get();
                                     color.a = value as f32 / 255.0;
-                                    on_change.call(color);
+                                    on_change.run(color);
                                 },
                                 Err(_) => {},
                             }

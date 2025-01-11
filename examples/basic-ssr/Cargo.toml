@@ -7,29 +7,22 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-log = "0.4"
-console_log = "1"
+leptos = { version = "0.7.0" }
+leptos_router = { version = "0.7.0" }
 axum = { version = "0.7", optional = true }
 console_error_panic_hook = "0.1"
-leptos = { version = "0.6.15" }
-leptos_axum = { version = "0.6.0", optional = true }
-leptos_meta = { version = "0.6.0" }
-leptos_router = { version = "0.6.0" }
+leptos_axum = { version = "0.7.0", optional = true }
+leptos_meta = { version = "0.7.0" }
+leptos_color = { path = "../.." }
 tokio = { version = "1", features = ["rt-multi-thread"], optional = true }
-tower = { version = "0.4", optional = true, features = ["util"] }
+tower = { version = "0.4", optional = true }
 tower-http = { version = "0.5", features = ["fs"], optional = true }
-wasm-bindgen = "=0.2.93"
+wasm-bindgen = "=0.2.99"
 thiserror = "1"
-tracing = { version = "0.1", optional = true }
 http = "1"
-leptos_color = { path = "../..", features = ["color_input"] }
+
 [features]
-hydrate = [
-    "leptos/hydrate",
-    "leptos_meta/hydrate",
-    "leptos_router/hydrate",
-    "leptos_color/hydrate",
-]
+hydrate = ["leptos/hydrate", "leptos_color/hydrate"]
 ssr = [
     "dep:axum",
     "dep:tokio",
@@ -40,7 +33,6 @@ ssr = [
     "leptos_meta/ssr",
     "leptos_router/ssr",
     "leptos_color/ssr",
-    "dep:tracing",
 ]
 
 # Defines a size-optimized profile for the WASM bundle in release mode

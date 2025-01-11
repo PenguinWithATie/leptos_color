@@ -17,7 +17,7 @@ cargo install cargo-leptos --locked
 
 Then run
 ```bash
-cargo leptos new --git leptos-rs/start-axum
+cargo leptos new --git https://github.com/leptos-rs/start-axum-0.7
 ```
 
 to generate a new project template.
@@ -44,6 +44,7 @@ By default, `cargo-leptos` uses `nightly` Rust, `cargo-generate`, and `sass`. If
 2. `rustup target add wasm32-unknown-unknown` - add the ability to compile Rust to WebAssembly
 3. `cargo install cargo-generate` - install `cargo-generate` binary (should be installed automatically in future)
 4. `npm install -g sass` - install `dart-sass` (should be optional in future
+5. Run `npm install` in end2end subdirectory before test
 
 ## Compiling for Release
 ```bash
@@ -76,12 +77,12 @@ basic-ssr
 site/
 ```
 Set the following environment variables (updating for your project as needed):
-```text
-LEPTOS_OUTPUT_NAME="basic-ssr"
-LEPTOS_SITE_ROOT="site"
-LEPTOS_SITE_PKG_DIR="pkg"
-LEPTOS_SITE_ADDR="127.0.0.1:3000"
-LEPTOS_RELOAD_PORT="3001"
+```sh
+export LEPTOS_OUTPUT_NAME="basic-ssr"
+export LEPTOS_SITE_ROOT="site"
+export LEPTOS_SITE_PKG_DIR="pkg"
+export LEPTOS_SITE_ADDR="127.0.0.1:3000"
+export LEPTOS_RELOAD_PORT="3001"
 ```
 Finally, run the server binary.
 

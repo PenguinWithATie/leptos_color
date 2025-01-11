@@ -1,9 +1,9 @@
-use ev::{mousemove, mouseup, touchend, touchmove, Event, UiEvent};
-use html::Div;
-use leptos::*;
+use leptos::ev::{mousemove, mouseup, touchend, touchmove, Event, UiEvent};
+use leptos::html::Div;
+use leptos::prelude::*;
 use leptos_use::{use_document, use_event_listener};
 use std::ops::Deref;
-use wasm_bindgen::JsCast;
+use web_sys::wasm_bindgen::JsCast;
 use web_sys::{Element, MouseEvent, TouchEvent};
 #[derive(Clone)]
 pub struct UsePositionProps {
@@ -118,7 +118,7 @@ pub fn use_position(props: UsePositionProps) -> (NodeRef<Div>, Callback<UiEvent>
                 e.prevent_default();
             }
             if let Some(pos) = get_position(&e) {
-                on_move.call(pos);
+                on_move.run(pos);
             }
         }
     };
@@ -126,7 +126,7 @@ pub fn use_position(props: UsePositionProps) -> (NodeRef<Div>, Callback<UiEvent>
     let handle_start = move |e: UiEvent| {
         set_dragging.set(true);
         if let Some(pos) = get_position(&e) {
-            props.on_move.call(pos);
+            props.on_move.run(pos);
         }
     };
 

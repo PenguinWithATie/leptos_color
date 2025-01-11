@@ -18,7 +18,7 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-leptos_color = "0.6.14"
+leptos_color = "0.7.0"
 ```
 
 ## Usage
