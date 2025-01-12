@@ -107,7 +107,6 @@ pub fn ColorInput(
     ];
 
     on_cleanup(move || {
-        set_open.set(false);
         click_outside.remove();
     });
     let UseFloatingReturn {
